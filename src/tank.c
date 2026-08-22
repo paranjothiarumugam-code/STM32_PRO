@@ -57,3 +57,20 @@ int tank_is_full(const tank_t *t) {
     }
     return t->last_distance_cm <= TANK_FULL_CM;
 }
+
+int tank_percent(const tank_t *t) {
+    if (t->overflow) {
+        return 100;
+    }
+    if (t->last_distance_cm < 0) {
+        return -1;
+    }
+    if (t->last_distance_cm <= TANK_FULL_CM) {
+        return 100;
+    }
+    if (t->last_distance_cm >= TANK_EMPTY_CM) {
+        return 0;
+    }
+    return (int)(100 * (TANK_EMPTY_CM - t->last_distance_cm) /
+                 (TANK_EMPTY_CM - TANK_FULL_CM));
+}

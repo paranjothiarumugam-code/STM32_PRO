@@ -36,6 +36,13 @@ int tank_needs_fill(const tank_t *t);
  * depends on the ultrasonic sensor alone. */
 int tank_is_full(const tank_t *t);
 
+/* Fill percentage for the status display only (0-100), derived from
+ * last_distance_cm and TANK_FULL_CM/TANK_EMPTY_CM. Returns -1 if the
+ * ultrasonic sensor has no reading (fault/no echo) — this never feeds
+ * back into fill/overflow control, which relies on tank_needs_fill()/
+ * tank_is_full() instead. */
+int tank_percent(const tank_t *t);
+
 static inline void tank_valve(const tank_t *t, int open) {
     gpio_write(t->valve_port, t->valve_pin, open ? 1 : 0);
 }

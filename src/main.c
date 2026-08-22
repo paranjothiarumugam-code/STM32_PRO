@@ -6,6 +6,9 @@
  * tank's solenoid valve is ever open at a time; the pump runs only
  * while a valve is open. Tanks are filled in priority order
  * (tank[0], then tank[1], then tank[2]) — see pump_ctrl_step().
+ *
+ * A 20x4 I2C LCD (see display.c) shows all 3 tank levels and pump
+ * status; it's best-effort and can never block the control loop above.
  */
 #include "config.h"
 #include "gpio.h"
@@ -13,6 +16,7 @@
 #include "uart.h"
 #include "tank.h"
 #include "pump.h"
+#include "display.h"
 
 #define ULTRASONIC_POLL_MS 400
 #define LOG_INTERVAL_MS    2000
@@ -63,11 +67,13 @@ int main(void) {
               FLOAT_PIN_T3, ACT_PORT, VALVE_PIN_T3);
 
     pump_ctrl_init(&pump, tanks, NUM_TANKS, ACT_PORT, PUMP_PIN);
+    display_init();
 
     uart_puts("\r\n3-tank overflow controller booted\r\n");
 
     uint32_t next_ultrasonic_ms = 0;
     uint32_t next_log_ms = 0;
+    uint32_t next_display_ms = 0;
     int round_robin = 0;
 
     for (;;) {
@@ -97,6 +103,11 @@ int main(void) {
         if ((int32_t)(now - next_log_ms) >= 0) {
             log_status();
             next_log_ms = now + LOG_INTERVAL_MS;
+        }
+
+        if ((int32_t)(now - next_display_ms) >= 0) {
+            display_update(tanks, NUM_TANKS, &pump);
+            next_display_ms = now + DISPLAY_REFRESH_MS;
         }
     }
 }

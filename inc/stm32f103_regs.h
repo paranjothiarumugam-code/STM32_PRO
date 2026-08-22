@@ -63,6 +63,7 @@ typedef struct {
 #define RCC_APB2ENR_USART1EN (1UL << 14)
 
 #define RCC_APB1ENR_TIM2EN (1UL << 0)
+#define RCC_APB1ENR_I2C1EN (1UL << 21)
 
 /* ------------------------------------------------------------------ */
 /* GPIO                                                                 */
@@ -91,6 +92,7 @@ typedef struct {
 #define GPIO_MODE_OUT_50MHZ       0x3U
 #define GPIO_CNF_OUT_PUSHPULL     0x0U
 #define GPIO_CNF_OUT_AF_PUSHPULL  0x8U
+#define GPIO_CNF_OUT_AF_OPENDRAIN 0xCU
 
 /* ------------------------------------------------------------------ */
 /* TIM2 (used as a free-running 1 us tick source for ultrasonic timing) */
@@ -132,6 +134,34 @@ typedef struct {
 #define USART_CR1_TE  (1UL << 3)
 #define USART_CR1_RE  (1UL << 2)
 
+/* ------------------------------------------------------------------ */
+/* I2C1 (drives the PCF8574-backed character LCD)                      */
+/* ------------------------------------------------------------------ */
+typedef struct {
+    __IO uint32_t CR1;
+    __IO uint32_t CR2;
+    __IO uint32_t OAR1;
+    __IO uint32_t OAR2;
+    __IO uint32_t DR;
+    __IO uint32_t SR1;
+    __IO uint32_t SR2;
+    __IO uint32_t CCR;
+    __IO uint32_t TRISE;
+} I2C_TypeDef;
+#define I2C1 ((I2C_TypeDef *)0x40005400UL)
+
+#define I2C_CR1_PE    (1UL << 0)
+#define I2C_CR1_START (1UL << 8)
+#define I2C_CR1_STOP  (1UL << 9)
+#define I2C_CR1_ACK   (1UL << 10)
+
+#define I2C_SR1_SB    (1UL << 0)
+#define I2C_SR1_ADDR  (1UL << 1)
+#define I2C_SR1_BTF   (1UL << 2)
+#define I2C_SR1_TXE   (1UL << 7)
+#define I2C_SR2_BUSY  (1UL << 1)
+
 #define SYSTEM_CLOCK_HZ 72000000UL
+#define APB1_CLOCK_HZ (SYSTEM_CLOCK_HZ / 2UL) /* PPRE1 = /2 */
 
 #endif /* STM32F103_REGS_H */
