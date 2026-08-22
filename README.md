@@ -67,12 +67,31 @@ PB12 (3.3V logic) -> opto-isolated relay module input
 
 A 2 HP motor also needs, at minimum, a thermal overload relay in series
 with the contactor and appropriate branch circuit protection (breaker/
-fuse) sized per the motor's nameplate current and your local electrical
-code. None of that is optional and none of it is something firmware can
-substitute for — get it wired by someone qualified for the voltage/
-current involved. The same applies to the 3 solenoid valves: use valves
-rated for your line pressure and drive them through relays, not directly
-from the MCU.
+fuse) sized per the motor's actual running current and your local
+electrical code. None of that is optional and none of it is something
+firmware can substitute for — get it wired by someone qualified for the
+voltage/current involved. The same applies to the 3 solenoid valves: use
+valves rated for your line pressure and drive them through relays, not
+directly from the MCU.
+
+### Motor circuit ratings for this pump (230V single-phase, 9.2A running)
+
+No nameplate was available; these ratings are sized off a measured
+running current of 9.2A at 230V single-phase — re-check against the
+nameplate if you find one, since starting current and duty cycle can
+shift the right size.
+
+| Component | Rating |
+|---|---|
+| Contactor | 16A, AC-3 (motor duty) rated, 2-pole (switches both line and neutral) |
+| Thermal overload relay | Adjustable 6–10A range, dial set to 9.2–9.5A |
+| Branch MCB | 16A, C-curve, 2-pole |
+| Motor wiring | 2.5 sq mm copper |
+
+The overload relay is what actually protects the motor winding on a
+stall or overheat — don't omit it even though the contactor alone would
+technically switch the load. A C-curve (not B-curve) breaker is
+important too: a B-curve trips on the motor's normal starting inrush.
 
 Float switches and ultrasonic sensors are low-voltage/low-current and
 can be wired straight to the GPIO pins as configured (see `tank_init()`
