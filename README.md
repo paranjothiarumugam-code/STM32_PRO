@@ -140,9 +140,32 @@ on Debian/Ubuntu).
 
 ```sh
 make            # builds build/tank_controller.elf/.bin/.hex
-make flash      # flashes via st-flash (ST-Link), or use your preferred tool
+make flash      # flashes via st-flash (ST-Link)
+make flash-cube # flashes via STM32CubeProgrammer's CLI (see below)
 make clean
 ```
+
+### Flashing with STM32CubeProgrammer
+
+Install [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
+and connect the Blue Pill via an ST-Link (or a USB-serial adapter for
+UART bootloader flashing). Two ways to flash the build:
+
+- **GUI**: open STM32CubeProgrammer, connect (ST-Link, SWD, default
+  settings), then under "Erasing & Programming" browse to
+  `build/tank_controller.hex`, tick "Verify programming" and "Run after
+  programming", and click **Start Programming**.
+- **CLI** (same tool, scriptable): run `make flash-cube`. It calls
+  `STM32_Programmer_CLI` directly — make sure that binary is on your
+  PATH (it ships inside the CubeProgrammer install, e.g. under
+  `STM32CubeProgrammer/bin` on Windows/Linux or inside the `.app` on
+  macOS). If you're flashing over UART instead of SWD, replace
+  `port=SWD` in the Makefile's `flash-cube` target with your serial
+  port, e.g. `port=/dev/ttyUSB0` or `port=COM5`.
+
+Either way, only `build/tank_controller.hex` is needed — it already
+encodes the 0x08000000 flash start address, so there's nothing else to
+configure.
 
 No CubeMX project, HAL, or CMSIS device pack is required — `inc/stm32f103_regs.h`
 defines just the registers this project touches, and `startup/startup_stm32f103xb.s`

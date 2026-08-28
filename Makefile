@@ -24,7 +24,7 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
-.PHONY: all clean flash
+.PHONY: all clean flash flash-cube
 
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin $(BUILD_DIR)/$(TARGET).hex
 	$(SIZE) $(BUILD_DIR)/$(TARGET).elf
@@ -49,6 +49,13 @@ $(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
 
 flash: $(BUILD_DIR)/$(TARGET).bin
 	st-flash write $(BUILD_DIR)/$(TARGET).bin 0x08000000
+
+# Requires STM32CubeProgrammer installed with its CLI (STM32_Programmer_CLI)
+# on your PATH. Flashes over SWD via ST-Link; add "port=JTAG" or a serial
+# port (e.g. port=COM5 / /dev/ttyUSB0) instead of "port=SWD" if you're
+# using a different interface.
+flash-cube: $(BUILD_DIR)/$(TARGET).hex
+	STM32_Programmer_CLI -c port=SWD -w $(BUILD_DIR)/$(TARGET).hex -v -rst
 
 clean:
 	rm -rf $(BUILD_DIR)
